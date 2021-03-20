@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -30,25 +31,25 @@ public class MainActivity extends AppCompatActivity implements Dialog.DialogList
 
     private MFabButtons mFab;
 
-    SharedPref sharedpref;
-    public Switch myswitch;
+    SharedClass shared;
 
     public ArrayList<String> lista;
-    public  ArrayAdapter adapter;
-    public  ListView view_lista;
+    public ArrayAdapter adapter;
+    public ListView view_lista;
     public TextView github;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        sharedpref = new SharedPref(this);
-        if(sharedpref.loadNightModeState()==true) {
+        shared = new SharedClass(MainActivity.this);
+
+        if(shared.NightMode()) {
             setTheme(R.style.darktheme);
-        }
-        else  setTheme(R.style.AppTheme);
+        }else  setTheme(R.style.AppTheme);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-         github = (TextView) findViewById(R.id.git_text);
+        github = findViewById(R.id.git_text);
 
         lista = SaveLoadData.LoadData_2(this);
 
@@ -73,7 +74,7 @@ public class MainActivity extends AppCompatActivity implements Dialog.DialogList
                           public void onClick(DialogInterface dialog, int which) {
                               lista.remove(position);
                               view_lista.setAdapter(adapter);
-                              SaveLoadData.saveData_2(lista,getApplicationContext());
+                              SaveLoadData.saveData_2(lista, getApplicationContext());
                           }
                       }).setMessage("Cancellare il dato selezionato?");
                 AlertDialog alert = alertbuilder.create();
@@ -92,7 +93,7 @@ public class MainActivity extends AppCompatActivity implements Dialog.DialogList
         FloatingActionButton fab_button_1 = findViewById(R.id.fab_button_1);
         FloatingActionButton fab_button_2 = findViewById(R.id.fab_button_2);
         FloatingActionButton fab_button_3 = findViewById(R.id.fab_button_3);
-        mFab = new MFabButtons(MainActivity.this, fab_button_1, fab_button_2, fab_button_3);
+        mFab = new  MFabButtons(fab_button_1, fab_button_2, fab_button_3);
 
         fab_button_1.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -113,20 +114,20 @@ public class MainActivity extends AppCompatActivity implements Dialog.DialogList
             @Override
             public void onClick(View v) {
                 mFab.menuCheck();
-                final AlertDialog.Builder alertbuilder = new AlertDialog.Builder(MainActivity.this);
-                alertbuilder.setCancelable(false);
-                alertbuilder.setTitle("Eliminare i dati ?").setMessage("Sei sicuro di voler eliminare tutti i dati?").setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                final AlertDialog.Builder alertbuilder = new AlertDialog.Builder(MainActivity.this)
+                        .setTitle("Eliminare i dati ?").setMessage("Sei sicuro di voler eliminare tutti i dati?").setPositiveButton("Si", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         adapter.clear();
                         SaveLoadData.saveData_2(lista,getApplicationContext());
                     }
-                }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+                }).setNegativeButton("Annulla", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
                     }
                 });
-                AlertDialog alert = alertbuilder.create();
+                final AlertDialog alert = alertbuilder.create();
                 alert.show();
             }
         });
@@ -145,44 +146,43 @@ public class MainActivity extends AppCompatActivity implements Dialog.DialogList
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
-        int id = item.getItemId();
-        if(id==R.id.item_1){
-            LayoutInflater inflater = MainActivity.this.getLayoutInflater();
-            View view = inflater.inflate(R.layout.dialog_info, null);
-            final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-            builder.setView(view).setTitle("Info").setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                }
-            }).setNegativeButton("No", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
+        switch(item.getItemId()){
+            case R.id.item_1:
+                LayoutInflater inflater = MainActivity.this.getLayoutInflater();
+                View view = inflater.inflate(R.layout.dialog_info, null);
+                final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this)
+                        .setView(view).setTitle("Info").setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                final AlertDialog alert = builder.create();
+                alert.show();
+                break;
 
-                }
-            });
-            AlertDialog alert = builder.create();
-            alert.show();
-        }
-
-        if(id==R.id.item_2){
-            startActivity(new Intent(getApplicationContext(),Impostazioni.class));
+            case R.id.item_2:
+                startActivity(new Intent(getApplicationContext(),Impostazioni.class));
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
 
     @Override
     public void applyText(String testo) {
-        if(testo.equals("")){
-           Toast toast = Toast.makeText(this, "Devi inserire qualcosa ", Toast.LENGTH_SHORT);
-           toast.setGravity(Gravity.CENTER | Gravity.CENTER_HORIZONTAL,0,0);
-           toast.show();
-
-        }else {
+        if(!TextUtils.isEmpty(testo)){
             adapter.add(testo);
             SaveLoadData.saveData_2(lista,this);
-            Toast toast =Toast.makeText(getApplicationContext(),"Dati salvati",Toast.LENGTH_SHORT);
-            toast.setGravity(Gravity.CENTER | Gravity.CENTER_HORIZONTAL,0,0);
-            toast.show();
+            notifyUser("Salvato");
+
+        }else {
+            notifyUser("Devi inserire qualcosa");
         }
+    }
+
+    public void notifyUser(String message){
+        Toast toast = Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG);
+        toast.setGravity(Gravity.CENTER | Gravity.CENTER_HORIZONTAL,0,0);
+        toast.show();
     }
 }

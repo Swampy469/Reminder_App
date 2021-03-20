@@ -1,25 +1,21 @@
 package com.swampy.aggiungereelementi;
 
-import android.content.Context;
-import android.view.View;
 import android.view.animation.OvershootInterpolator;
-
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 class MFabButtons {
-    private FloatingActionButton fab_button_1, fab_button_2, fab_button_3;
-    private OvershootInterpolator overshootInterpolator = new OvershootInterpolator();
-    private int fabTranslationY = 100;
+    private final FloatingActionButton fab_button_1;
+    private final FloatingActionButton fab_button_2;
+    private final FloatingActionButton fab_button_3;
+    private final OvershootInterpolator overshootInterpolator = new OvershootInterpolator();
+    private final int fabTranslationY = 100;
     private boolean isFabMenuOpen = false;
-    private int speed = 250;
-    private Context context;
+    private final int speed = 250;
 
-    MFabButtons(Context context, FloatingActionButton fab_button_1, FloatingActionButton fab_button_2, FloatingActionButton fab_button_3) {
+    MFabButtons(FloatingActionButton fab_button_1, FloatingActionButton fab_button_2, FloatingActionButton fab_button_3) {
         this.fab_button_1 = fab_button_1;
         this.fab_button_2 = fab_button_2;
         this.fab_button_3 = fab_button_3;
-
-        this.context = context;
 
         setFabTranslationY();
     }

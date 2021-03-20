@@ -14,9 +14,6 @@ import androidx.appcompat.app.AppCompatDialogFragment;
 
 public class Dialog extends AppCompatDialogFragment {
 
-    //Debugging
-    private static final String TAG = "Dialog";
-
     private EditText testo;
     private DialogListener listener;
 
@@ -48,7 +45,7 @@ public class Dialog extends AppCompatDialogFragment {
         try {
             listener = (DialogListener) context;
         } catch (ClassCastException e) {
-           throw  new ClassCastException(context.toString()+"errore");
+           throw  new ClassCastException(context.toString() + "errore");
         }
     }
 

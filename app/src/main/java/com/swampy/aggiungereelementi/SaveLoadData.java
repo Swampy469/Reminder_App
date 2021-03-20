@@ -22,8 +22,6 @@ public class SaveLoadData {
             ObjectOutput oos = new ObjectOutputStream(file_os);
             oos.writeObject(oggetto);
             oos.close();
-        }catch(FileNotFoundException e){
-            e.printStackTrace();
         }catch(IOException e){
             e.printStackTrace();
         }
@@ -31,17 +29,13 @@ public class SaveLoadData {
     }
 
     public static ArrayList<String> LoadData_2(Context context){
-        ArrayList<String> oggetti_lista = null;
+        ArrayList<String> oggetti_lista;
         try{
             FileInputStream file_is = context.openFileInput(FILENAME);
             ObjectInputStream ois = new ObjectInputStream(file_is);
             oggetti_lista = (ArrayList<String>) ois.readObject();
-        }catch (FileNotFoundException e ){
+        }catch (IOException | ClassNotFoundException e ){
             oggetti_lista = new ArrayList<>();
-            e.printStackTrace();
-        }catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
         return oggetti_lista;
